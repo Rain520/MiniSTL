@@ -75,17 +75,17 @@ namespace jan{
 	}
 
 	template <typename Iterator>
-	inline typename iterator_traits<Iterator>::difference_type
+	inline typename iterator_traits<Iterator>::difference_type *
 	distance_type(const Iterator & iterator)
 	{
-		return static_cast<typename iterator_traits<Iterator>::difference_type>(0);
+		return nullptr;
 	}
 
 	template <typename Iterator>
-	inline typename iterator_traits<Iterator>::value_type
+	inline typename iterator_traits<Iterator>::value_type *
 	value_type(const Iterator & iterator)
 	{
-		return static_cast<typename iterator_traits<Iterator>::value_type>(0);
+		return nullptr;
 	}
 
 	//distanceÏµÁÐº¯Êý

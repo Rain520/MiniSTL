@@ -137,7 +137,7 @@ namespace jan{
 	//…Ë÷√“ªº∂≈‰÷√∆˜
 	using malloc_alloc = level_one_alloc_template<0>;
 
-	enum {_ALIGN = 8, _MAX_BYES = 128, _NFREELISTS = _MAX_BYES / _ALIGN};
+	enum {_ALIGN = 8, _MAX_BYES = 128, _NFREELISTS = _MAX_BYES / _ALIGN}; // NOLINT(bugprone-reserved-identifier)
 	template <int ints>
 	class level_two_alloc_template
 	{
