@@ -8,11 +8,17 @@
 
 namespace jan{
 	//用于识别迭代器类型的一族
-	struct input_iterator{ };
-	struct output_iterator{ };
-	struct forward_iterator : public input_iterator { };
-	struct bidirectional_iterator : public forward_iterator{ };
-	struct random_access_iterator : public bidirectional_iterator { };
+//	struct input_iterator_tag { };
+//	struct output_iterator_tag { };
+//	struct forward_iterator_tag : public input_iterator_tag { };
+//	struct bidirectional_iterator_tag : public forward_iterator_tag { };
+//	struct random_access_iterator_tag : public bidirectional_iterator_tag { };
+
+	using std::input_iterator_tag;
+	using std::output_iterator_tag;
+	using std::forward_iterator_tag;
+	using std::bidirectional_iterator_tag;
+	using std::random_access_iterator_tag;
 
 	/**
 	 * 为了防止自行开发的迭代器遗漏了一些typedef，可以继承这个迭代器
@@ -49,7 +55,7 @@ namespace jan{
 	template<typename T>
 	struct iterator_traits<T*>
 	{
-		typedef random_access_iterator	iterator_category;
+		typedef random_access_iterator_tag iterator_category;
 		typedef T						value_type;
 		typedef ptrdiff_t 				difference_type;
 		typedef T*						pointer;
@@ -59,19 +65,26 @@ namespace jan{
 	template<typename T>
 	struct iterator_traits<const T*>
 	{
-		typedef random_access_iterator	iterator_category;
+		typedef random_access_iterator_tag iterator_category;
 		typedef T						value_type;
 		typedef ptrdiff_t 				difference_type;
 		typedef const T*				pointer;
 		typedef const T&				reference;
 	};
 
+	/**
+	 * @brief 获得迭代器的种类 
+	 * 
+	 * @tparam Iterator 
+	 * @param iterator 
+	 * @return iterator_traits<Iterator>::iterator_category 
+	 */
 	template <typename Iterator>
 	inline typename iterator_traits<Iterator>::iterator_category
 	iterator_category(const Iterator & iterator)
 	{
 
-		return iterator_traits<Iterator>::iterator_category ();
+		return typename iterator_traits<Iterator>::iterator_category ();
 	}
 
 	template <typename Iterator>
@@ -91,7 +104,7 @@ namespace jan{
 	//distance系列函数
 	template <typename InputIterator>
 	inline typename iterator_traits<InputIterator>::difference_type
-	_distance(InputIterator first, InputIterator last, input_iterator)
+	_distance(InputIterator first, InputIterator last, input_iterator_tag)
 	{
 		typename iterator_traits<InputIterator>::difference_type count = 0;
 		while (first != last)
@@ -104,7 +117,7 @@ namespace jan{
 
 	template <typename RandomIterator>
 	inline typename iterator_traits<RandomIterator>::difference_type
-	_distance(const RandomIterator & first, const RandomIterator & last, random_access_iterator)
+	_distance(const RandomIterator & first, const RandomIterator & last, random_access_iterator_tag)
 	{
 		return last - first;
 	}
@@ -119,19 +132,19 @@ namespace jan{
 
 	//advance系列函数
 	template <typename InputIterator, typename Distance>
-	inline void _advance(InputIterator & i, Distance n, input_iterator)
+	inline void _advance(InputIterator & i, Distance n, input_iterator_tag)
 	{
 		while (n--)
 			++i;
 	}
 	template <typename RandomIterator, typename Distance>
-	inline void _advance(RandomIterator & i, Distance n, random_access_iterator)
+	inline void _advance(RandomIterator & i, Distance n, random_access_iterator_tag)
 	{
 		i += n;
 	}
 
 	template <typename BidirectionalIterator, typename Distance>
-	inline void _advance(BidirectionalIterator & i, Distance n, bidirectional_iterator)
+	inline void _advance(BidirectionalIterator & i, Distance n, bidirectional_iterator_tag)
 	{
 		if(n > 0)
 			while (n--) ++i;
