@@ -26,9 +26,18 @@ struct pair
 	pair(pair && )  noexcept = default;
 
 
-	pair<T1,T2> & operator=(const pair<T1,T2> & p) = default;
+	pair<T1,T2> & operator=(const pair<T1,T2> & p)
+	{
+		first = p.first;
+		second = p.second;
+	}
+//	pair & operator=(const pair & p) = default;
 
-	pair<T1,T2> & operator=(pair<T1,T2> && p) noexcept = default;
+	pair<T1,T2> & operator=(pair<T1,T2> && p) noexcept
+	{
+		first = std::move(p.first);
+		second = std::move(p.second);
+	}
 
 	bool operator==(const pair<T1,T2> & p) const
 	{
