@@ -178,9 +178,9 @@ namespace jan
 	template<typename T>
 	inline void swap(T& a, T& b)
 	{
-		T tmp = a;
-		a = b;
-		b = tmp;
+		T tmp = std::move(a);
+		a = std::move(b);
+		b = std::move(tmp);
 	}
 
 	template<typename InputIter1, typename InputIter2>
