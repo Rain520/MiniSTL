@@ -2,9 +2,11 @@
 #define __MY_ALGORITHM_H_
 #include "my_iterator.h"
 #include "my_type_traits.h"
+#include <algorithm>
 #include <cstddef>
 #include <cstring>
 #include <iostream>
+#include <iterator>
 
 namespace jan
 {
@@ -191,7 +193,7 @@ namespace jan
 			if (*first1 != *last1)
 				break;
 		}
-		return {first1,first2};
+		return {first1, first2};
 	}
 
 	template<typename InputIter1, typename InputIter2, typename BinaryOp>
@@ -218,8 +220,8 @@ namespace jan
 	inline char* copy(const char* first, const char* last, char* res)
 	{
 		//char is one byte
-        std::cout << (last - first) << std::endl;
-        std::cin.get();
+		std::cout << (last - first) << std::endl;
+		std::cin.get();
 		memmove(res, first, last - first);
 		return res + (last - first);
 	}
@@ -258,7 +260,7 @@ namespace jan
 		return res;
 	}
 
-    /**下面两个函数是堆迭代器为原生指针类型做的优化**/
+	/**下面两个函数是堆迭代器为原生指针类型做的优化**/
 	/**
  * @brief 如果对象具有无关紧要的赋值运算符，也就是trivial assianment operator会调用这个版本,这是一个最终版
  * 
@@ -271,8 +273,8 @@ namespace jan
 	template<typename T>
 	inline T* __copy_t(const T* first, const T* last, T* res, _true_type)
 	{
-        // std::cout << "[len:" << (last - first) << ":]" << std::endl;
-		memmove(res, first,sizeof(T) * (last - first));
+		// std::cout << "[len:" << (last - first) << ":]" << std::endl;
+		memmove(res, first, sizeof(T) * (last - first));
 		return res + (last - first);
 	}
 
@@ -337,7 +339,7 @@ namespace jan
 			return __copy(first, last, res, iterator_category(first));
 		}
 	};
-    /**
+	/**
      * @brief 用于作为中转函数的仿函数,对于T*的偏特化版本
      * 
      * @tparam T 
@@ -351,7 +353,7 @@ namespace jan
 			return __copy_t(first, last, res, t());
 		}
 	};
-    /**
+	/**
      * @brief 用于作为中转函数的仿函数,对于const T*, T*的偏特化版
      * 
      * @tparam T 
@@ -365,7 +367,7 @@ namespace jan
 		}
 	};
 
-    /**
+	/**
      * @brief 将[first,last) 区间内的元素复制到以res起始的容器区间,
      *        对外提供的copy接口，用户应当仅仅使用这个函数
      * 
@@ -381,6 +383,235 @@ namespace jan
 	{
 		return __copy_dispatch<InputIter, OutputIter>()(first, last, res);
 	}
+
+	/**
+	 * @brief 集合的并集算法
+	 * 
+	 * @tparam InputIter 
+	 * @tparam OutputIter 
+	 * @param first1 
+	 * @param last1 
+	 * @param first2 
+	 * @param last2 
+	 * @param res 
+	 * @return OutputIter 
+	 */
+	template<typename InputIter1, typename InputIter2, typename OutputIter>
+	OutputIter set_union(InputIter1 first1, InputIter1 last1,
+								InputIter2 first2, InputIter2 last2,
+								OutputIter res)
+	{
+		while (first1 != last1 && first2 != last2)
+		{
+			if (*first1 < *first2)
+			{
+				*res = *first1;
+				++first1;
+			}
+			else if (*first2 < *first1)
+			{
+				*res = *first2;
+				++first2;
+			}
+			else
+			{
+				*res = *first1;
+				++first1;
+				++first2;
+			}
+			++res;
+		}
+		return jan::copy(first2,last2,jan::copy(first1,last1,res));
+	}
+
+	/**
+	 * @brief 集合的差集算法
+	 * 
+	 * @tparam InputIter 
+	 * @tparam OutputIter 
+	 * @param first1 
+	 * @param last1 
+	 * @param first2 
+	 * @param last2 
+	 * @param res 
+	 * @return OutputIter 
+	 */
+	template<typename InputIter1, typename InputIter2, typename OutputIter>
+	OutputIter set_diffrence(InputIter1 first1, InputIter1 last1,
+								InputIter2 first2, InputIter2 last2,
+								OutputIter res)
+	{
+		while (first1 != last1 && first2 != last2)
+		{
+			if (*first1 > *first2)
+				++first2;
+			else if (*first1 < *first2)
+			{
+				*res = *first1;
+				++res;
+				++first1;
+			}
+			else
+			{
+				++first1;
+				++first2;
+			}
+		}
+		return jan::copy(first1, last1, res);
+	}
+
+	template<typename InputIter1, typename InputIter2, typename OutputIter>
+	OutputIter set_intersection(InputIter1 first1, InputIter1 last1,
+								InputIter2 first2, InputIter2 last2,
+								OutputIter res)
+	{
+		while (first1 != last1 && first2 != last2)
+		{
+			if (*first1 < *first2)
+				++first1;
+			else if (*first2 < *first1)
+				++first2;
+			else
+			{
+				*res = *first1;
+				++first1;
+				++first2;
+				++res;
+			}
+		}
+		return res;
+	}
+
+	/**
+	 * @brief 集合的对称差算法
+	 * 
+	 * @tparam InputIter1 
+	 * @tparam InputIter2 
+	 * @tparam OutputIter 
+	 * @param first1 
+	 * @param last1 
+	 * @param first2 
+	 * @param last2 
+	 * @param res 
+	 * @return OutputIter 
+	 */
+	template<typename InputIter1, typename InputIter2, typename OutputIter>
+	OutputIter set_symmetric_difference(InputIter1 first1, InputIter1 last1,
+								InputIter2 first2, InputIter2 last2,
+								OutputIter res)
+	{
+		while (first1 != last1 && first2 != last2)
+		{
+			if(*first1 < *first2)
+			{
+				*res = *first1;
+				++res;
+				++first1;
+			}
+			else if(*first2 < *first1)
+			{
+				*res = *first2;
+				++first2;
+				++res;
+			}
+			else
+			{
+				++first1;
+				++first2;
+			}
+		}
+		return jan::copy(first2,last2,jan::copy(first1,last1,res));
+	}
+
+	template <typename InputIter, typename T>
+	typename iterator_traits<InputIter>::difference_type
+	count(InputIter first, InputIter last, const T & val)
+	{
+		typename iterator_traits<InputIter>::difference_type ret;
+		for(; first !=last; ++first)
+			if(*first == val)
+				++ret;
+		return ret;
+	}
+
+	template <typename InputIter, typename Predicate>
+	typename iterator_traits<InputIter>::difference_type
+	count_if(InputIter first, InputIter last, Predicate pred)
+	{
+		typename iterator_traits<InputIter>::difference_type ret;
+		for(; first != last; ++first)
+			if(pred(*first))
+				++ret;
+		return ret;
+	}
+
+	template <typename ForwardIter>
+	ForwardIter adjacent_find(ForwardIter first, ForwardIter last)
+	{
+		ForwardIter next = first;
+		++next;
+		while (next != last)
+		{
+			if(*next == *first)
+				return first;
+			++first;
+			++next;
+		}
+		return last;
+	}
+
+	template <typename ForwardIter, typename BinaryPredicate>
+	ForwardIter adjacent_find(ForwardIter first, ForwardIter last, BinaryPredicate bin_pred)
+	{
+		ForwardIter next = first;
+		++next;
+		while (next != last)
+		{
+			if(bin_pred(*first,*next))
+				return first;
+			++first;
+			++next;
+		}
+		return last;
+	}
+	
+	template <typename InputIter, typename T>
+	InputIter find(InputIter first, InputIter last, const T & val)
+	{
+		while (first != last)
+		{
+			if(*first == val)
+				return first;
+			++first;
+		}
+		return last;
+	}
+
+	template <typename InputIter, typename T, typename Predicate>
+	InputIter find_if(InputIter first, InputIter last, const T & val, Predicate pred)
+	{
+		while (first != last)
+		{
+			if(pred(*first))
+				return first;
+			++first;
+		}
+		return last;
+	}
+
+	template <typename InputIter, typename F>
+	F for_each(InputIter first, InputIter last, F f)
+	{
+		while (first != last)
+		{
+			f(*first);
+			++first;
+		}
+		return f;
+	}
+
+	
+
 }// namespace jan
 
 #endif
