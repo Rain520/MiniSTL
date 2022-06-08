@@ -610,7 +610,21 @@ namespace jan
 		return f;
 	}
 
-	
+template <typename RandomIter>
+void merge_sort_iter(RandomIter first, RandomIter last)
+{
+	if(first == last - 1)
+		return;
+	using distance_type = typename iterator_traits<RandomIter>::difference_type;
+    distance_type dis = (last - first) / 2;
+	auto mid = first + dis;
+	merge_sort_iter(first,mid);
+	merge_sort_iter(mid, last);
+	using value_type = typename iterator_traits<RandomIter>::value_type;
+	vector<value_type> vec(last-first);
+	merge(first,mid,mid,last,vec.begin());
+	copy(vec.begin(),vec.end(),first);
+}	
 
 }// namespace jan
 
