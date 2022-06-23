@@ -5,7 +5,7 @@
 #ifndef MYSTL__MY_ITERATOR_H_
 #define MYSTL__MY_ITERATOR_H_
 #include <cstddef>
-
+#include <iterator>
 namespace jan{
 	//用于识别迭代器类型的一族
 //	struct input_iterator_tag { };
@@ -14,6 +14,7 @@ namespace jan{
 //	struct bidirectional_iterator_tag : public forward_iterator_tag { };
 //	struct random_access_iterator_tag : public bidirectional_iterator_tag { };
 
+//此迭代器种类不进行自定义，均using std::XXX，目的是能与std::STL适配
 	using std::input_iterator_tag;
 	using std::output_iterator_tag;
 	using std::forward_iterator_tag;

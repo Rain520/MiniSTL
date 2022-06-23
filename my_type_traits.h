@@ -10,7 +10,7 @@ namespace jan{
 	struct _false_type{ };
 #define A_BUILD_IN_TYPE(Type) 								\
     template<> struct type_traits<Type>{        			\
-        typedef _true_type has_trivial_default_constructor; \
+      typedef _true_type has_trivial_default_constructor; \
    		typedef _true_type has_trivial_copy_constructor;  	\
    		typedef _true_type has_trivial_assignment_operator;\
    		typedef _true_type has_trivial_destructor;  		\

@@ -1,13 +1,14 @@
 #include <iostream>
 #include <deque>
 #include <array>
+#include "my_vector.h"
 #include "my_allocator.h"
 #include "my_iterator.h"
-#include "my_heap.h"
+// #include "my_heap.h"
 #include <vector>
 #include <algorithm>
 #include <ctime>
-#include <windows.h>
+// #include <windows.h>
 #include <numeric>
 #include <iterator>
 #include <functional>
@@ -48,124 +49,124 @@ void print(const T & val)
 {
 	cout << val << " ";
 }
-void test_pop_heap()
-{
-	vector<int> vec{1,5,9,3,5,7,8,4,2,6};
-	make_heap(vec.begin(), vec.end());
-	for_each(vec.begin(), vec.end(), print<int>);
-	cout << endl;
-	pop_heap(vec.begin(), vec.end());
-	for_each(vec.begin(), vec.end(), print<int>);
-}
+// void test_pop_heap()
+// {
+// 	vector<int> vec{1,5,9,3,5,7,8,4,2,6};
+// 	make_heap(vec.begin(), vec.end());
+// 	for_each(vec.begin(), vec.end(), print<int>);
+// 	cout << endl;
+// 	pop_heap(vec.begin(), vec.end());
+// 	for_each(vec.begin(), vec.end(), print<int>);
+// }
 
-void test_my_push_heap()
-{
-	vector<int> vec{1,5,9,3,5,7,8,4,2,6};
-	make_heap(vec.begin(), vec.end());
-	for_each(vec.begin(), vec.end(), print<int>);
-	cout << endl;
-	vec.push_back(55);
-//	std::push_heap(vec.begin(), vec.end());
-//	for_each(vec.begin(), vec.end(), print<int>);
-	jan::push_heap(vec.begin(), vec.end());
-	for_each(vec.begin(), vec.end(), print<int>);
-}
+// void test_my_push_heap()
+// {
+// 	vector<int> vec{1,5,9,3,5,7,8,4,2,6};
+// 	make_heap(vec.begin(), vec.end());
+// 	for_each(vec.begin(), vec.end(), print<int>);
+// 	cout << endl;
+// 	vec.push_back(55);
+// //	std::push_heap(vec.begin(), vec.end());
+// //	for_each(vec.begin(), vec.end(), print<int>);
+// 	jan::push_heap(vec.begin(), vec.end());
+// 	for_each(vec.begin(), vec.end(), print<int>);
+// }
 
-void test_my_pop_heap()
-{
-	vector<int> vec{8,7,6,5,4,3,2,1,0,2};
-	std::make_heap(vec.begin(),vec.end());
-	for_each(vec.begin(),vec.end(),print<int>);
-	cout << endl;
-	jan::pop_heap(vec.begin(),vec.end());
-	for_each(vec.begin(),vec.end(),print<int>);
-	vector<int> vec1(1000);
-	srand((unsigned)time(0));
-	for(int & it : vec1)
-	{
-		it = rand() % 1000 + 1;
-	}
-	std::make_heap(vec1.begin(),vec1.end());
-	jan::sort_heap(vec1.begin(),vec1.end());
-	cout << endl;
-	for_each(vec1.begin(),vec1.end(),print<int>);
-	cout << endl;
-	cout << std::is_sorted(vec1.begin(),vec1.end());
+// void test_my_pop_heap()
+// {
+// 	vector<int> vec{8,7,6,5,4,3,2,1,0,2};
+// 	std::make_heap(vec.begin(),vec.end());
+// 	for_each(vec.begin(),vec.end(),print<int>);
+// 	cout << endl;
+// 	jan::pop_heap(vec.begin(),vec.end());
+// 	for_each(vec.begin(),vec.end(),print<int>);
+// 	vector<int> vec1(1000);
+// 	srand((unsigned)time(0));
+// 	for(int & it : vec1)
+// 	{
+// 		it = rand() % 1000 + 1;
+// 	}
+// 	std::make_heap(vec1.begin(),vec1.end());
+// 	jan::sort_heap(vec1.begin(),vec1.end());
+// 	cout << endl;
+// 	for_each(vec1.begin(),vec1.end(),print<int>);
+// 	cout << endl;
+// 	cout << std::is_sorted(vec1.begin(),vec1.end());
 
-}
+// }
 
-void test_my_make_heap()
-{
-	const int n = 100;
-	vector<int> vec1(n);
-	srand((unsigned)time(0));
-	for(auto it = vec1.begin(); it != vec1.end(); ++it)
-	{
-		*it = rand() % 1000 + 1;
-	}
-	auto vec_copy = vec1;
-	std::make_heap(vec_copy.begin(),vec_copy.end());
-	jan::make_heap(vec1.begin(),vec1.end());
-	cout << (vec1 == vec_copy);
-	jan::sort_heap(vec1.begin(),vec1.end());
-	std::sort_heap(vec_copy.begin(),vec_copy.end());
-	cout << std::is_sorted(vec1.begin(),vec1.end());
-	cout << std::is_sorted(vec_copy.begin(),vec_copy.end());
-}
+// void test_my_make_heap()
+// {
+// 	const int n = 100;
+// 	vector<int> vec1(n);
+// 	srand((unsigned)time(0));
+// 	for(auto it = vec1.begin(); it != vec1.end(); ++it)
+// 	{
+// 		*it = rand() % 1000 + 1;
+// 	}
+// 	auto vec_copy = vec1;
+// 	std::make_heap(vec_copy.begin(),vec_copy.end());
+// 	jan::make_heap(vec1.begin(),vec1.end());
+// 	cout << (vec1 == vec_copy);
+// 	jan::sort_heap(vec1.begin(),vec1.end());
+// 	std::sort_heap(vec_copy.begin(),vec_copy.end());
+// 	cout << std::is_sorted(vec1.begin(),vec1.end());
+// 	cout << std::is_sorted(vec_copy.begin(),vec_copy.end());
+// }
 
-void test_my_make_heap_time()
-{
-	int count = 10;
-	const int n = 1000000;
-	srand((unsigned)time(0));
-	while(count--)
-	{
-		cout << "---------" << endl;
-		vector<int> vec1(n);
-		for_each(vec1.begin(),vec1.end(),[](int & val){
-			val = rand() % 1000 + 1;
-		});
-		auto vec2 = vec1;
-		auto start_time = GetTickCount();
-		std::make_heap(vec1.begin(),vec1.end());
-		cout << "use std::make_heap: ";
-		cout << (GetTickCount()-start_time) << endl;
+// void test_my_make_heap_time()
+// {
+// 	int count = 10;
+// 	const int n = 1000000;
+// 	srand((unsigned)time(0));
+// 	while(count--)
+// 	{
+// 		cout << "---------" << endl;
+// 		vector<int> vec1(n);
+// 		for_each(vec1.begin(),vec1.end(),[](int & val){
+// 			val = rand() % 1000 + 1;
+// 		});
+// 		auto vec2 = vec1;
+// 		auto start_time = GetTickCount();
+// 		std::make_heap(vec1.begin(),vec1.end());
+// 		cout << "use std::make_heap: ";
+// 		cout << (GetTickCount()-start_time) << endl;
 
-		start_time = GetTickCount();
-		jan::make_heap(vec2.begin(),vec2.end());
-		cout << "use jan::make_heap: ";
-		cout << (GetTickCount()-start_time) << endl;
+// 		start_time = GetTickCount();
+// 		jan::make_heap(vec2.begin(),vec2.end());
+// 		cout << "use jan::make_heap: ";
+// 		cout << (GetTickCount()-start_time) << endl;
 
-	}
-}
+// 	}
+// }
 
-void test_my_sort_heap()
-{
-	int count = 10;
-	const int n = 1000000;
-	srand((unsigned)time(0));
-	while(count--)
-	{
-		cout << "---------" << endl;
-		vector<int> vec1(n);
-		for_each(vec1.begin(),vec1.end(),[](int & val){
-			val = rand() % 1000 + 1;
-		});
-		auto vec2 = vec1;
-		std::make_heap(vec1.begin(),vec1.end());
-		auto start_time = GetTickCount();
-		std::sort_heap(vec1.begin(),vec1.end());
-		cout << "use std::sort_heap: ";
-		cout << (GetTickCount()-start_time) << endl;
+// void test_my_sort_heap()
+// {
+// 	int count = 10;
+// 	const int n = 1000000;
+// 	srand((unsigned)time(0));
+// 	while(count--)
+// 	{
+// 		cout << "---------" << endl;
+// 		vector<int> vec1(n);
+// 		for_each(vec1.begin(),vec1.end(),[](int & val){
+// 			val = rand() % 1000 + 1;
+// 		});
+// 		auto vec2 = vec1;
+// 		std::make_heap(vec1.begin(),vec1.end());
+// 		auto start_time = GetTickCount();
+// 		std::sort_heap(vec1.begin(),vec1.end());
+// 		cout << "use std::sort_heap: ";
+// 		cout << (GetTickCount()-start_time) << endl;
 
-		jan::make_heap(vec2.begin(),vec2.end());
-		start_time = GetTickCount();
-		jan::sort_heap(vec2.begin(),vec2.end());
-		cout << "use jan::sort_heap: ";
-		cout << (GetTickCount()-start_time) << endl;
-	}
+// 		jan::make_heap(vec2.begin(),vec2.end());
+// 		start_time = GetTickCount();
+// 		jan::sort_heap(vec2.begin(),vec2.end());
+// 		cout << "use jan::sort_heap: ";
+// 		cout << (GetTickCount()-start_time) << endl;
+// 	}
 
-}
+// }
 
 void test_partial_sum()
 {
@@ -252,6 +253,21 @@ void test_my_copy()
 	cout << str2 << endl;
 
 }
+
+void test_uninitia()
+{
+  int a[10];
+  jan::fill_n(jan::fill_n(begin(a), 6, 100), 4, 20);
+  for_each(begin(a), end(a), print<int>);
+  cout << endl;
+}
+
+void test_vector()
+{
+  jan::vector<int> vec(10,2);
+  // for_each(vec.cbegin(), vec.cend(), print<int>);
+  cout << endl;
+}
 int main()
 {
 	//	test_pop_heap();
@@ -264,7 +280,9 @@ int main()
 	// test_my_adjacent_difference();
 	// test_iter_swap();
 	// test_my_pair();
-	test_my_copy();
+	// test_my_copy();
+  // test_uninitia();
+  test_vector();
 	cin.get();
 	return 0;
 }

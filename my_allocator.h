@@ -10,15 +10,33 @@
 #include <climits>
 #include <iostream>
 #include "my_type_traits.h"
+#include "my_iterator.h"
 //#define __MY_ALLOC_DEBUG
 namespace jan{
 
+//下列一些函数是配置器经常用到的方法，进行了一些优化
+
+ /**
+  * @brief before C++11 
+  * 
+  * @tparam T 
+  * @param p 
+  * @param val 
+  */
 	template <typename T>
 	inline void construct(T * p, const T & val)
 	{
 		new (p) T(val);
 	}
 
+ /**
+  * @brief after C++11
+  * 
+  * @tparam T 
+  * @tparam Args 
+  * @param p 
+  * @param args 
+  */
 	template <typename T, typename... Args>
 	inline void construct(T * p, Args && ... args)
 	noexcept (noexcept(::new(p) T(std::forward<Args>(args)...)))
@@ -32,6 +50,13 @@ namespace jan{
 		p->~T();
 	}
 
+  /**
+   * @brief not a POD type call this function
+   * 
+   * @tparam ForwardIterator 
+   * @param first 
+   * @param last 
+   */
 	template <typename ForwardIterator>
 	inline void _destroy_aux(ForwardIterator first, ForwardIterator last, _false_type)
 	{
@@ -41,25 +66,53 @@ namespace jan{
 		}
 	}
 
-	//空实现
+ /**
+  * @brief POD type call this function
+  * 
+  * @tparam ForwardIterator 
+  * @param first 
+  * @param last 
+  */
 	template <typename ForwardIterator>
 	inline void _destroy_aux(ForwardIterator first, ForwardIterator last, _true_type)
 	{ }
 
 
+ /**
+  * @brief 萃取出是否是POD类型，然后重载调用重载的aux版本
+  * 
+  * @tparam ForwardIterator 
+  * @tparam T 
+  * @param first 
+  * @param last 
+  */
 	template <typename ForwardIterator, typename T>
 	inline void _destroy(ForwardIterator first, ForwardIterator last, T *)
 	{
 		using has = typename type_traits<T>::has_trivial_destructor;
 		_destroy_aux(first,last,has());
 	}
+
+  /**
+   * @brief 用户应当使用这个
+   * 
+   * @tparam ForwardIterator 
+   * @param first 
+   * @param last 
+   */
 	template <typename ForwardIterator>
 	inline void destroy(ForwardIterator first, ForwardIterator last)
 	{
 		_destroy(first,last, value_type(first));
 	}
 
+  //such as new_handler
 	using malloc_handler = void (*)();
+ /**
+  * @brief 一级配置器，用于配置大块内存
+  * 
+  * @tparam ints 
+  */
 	template <int ints>
 	class level_one_alloc_template
 	{
@@ -137,7 +190,14 @@ namespace jan{
 	//设置一级配置器
 	using malloc_alloc = level_one_alloc_template<0>;
 
+  //为二级配置器准备的一些枚举值
 	enum {_ALIGN = 8, _MAX_BYES = 128, _NFREELISTS = _MAX_BYES / _ALIGN}; // NOLINT(bugprone-reserved-identifier)
+
+  /**
+   * @brief 二级配置器，使用内存池技术，在请求内存块大的时候调用一级配置器
+   * 
+   * @tparam ints 
+   */
 	template <int ints>
 	class level_two_alloc_template
 	{
@@ -339,7 +399,7 @@ namespace jan{
 	template <typename T,typename Alloc>
 	struct alloc_adapter{
 		typedef T		value_type;
-		T * allocate(size_t size)
+		static T * allocate(size_t size)
 		{
 #if defined(__MY_ALLOC_DEBUG)
 			std::cout << "[call allocate_adapter size is:" << size << "]" << std::endl;
@@ -347,17 +407,22 @@ namespace jan{
 			return size == 0 ? nullptr : (T*)Alloc::allocate(size * sizeof (T));
 		}
 
-		T * allocate()
+    /**
+     * @brief 返回一个sizeof T内存大小的首地址
+     * 
+     * @return T* 
+     */
+		static T * allocate()
 		{
 			return (T*)Alloc::allocate(sizeof (T));
 		}
 
-		void deallocate(T * p, size_t size)
+		static void deallocate(T * p, size_t size)
 		{
 			Alloc::deallocate(p,size);
 		}
 
-		void deallocate(T * p)
+		static void deallocate(T * p)
 		{
 			Alloc::delllocate(p,sizeof (T));
 		}
@@ -367,6 +432,12 @@ namespace jan{
 
 
 namespace jan{
+
+/**
+ * @brief 最简单的配置器，仅仅使用::operator new来分配内存, 定位new来初始化对象
+ *        
+ * @tparam T 
+ */
 template <typename T>
 class allocator
 {

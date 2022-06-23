@@ -35,7 +35,7 @@ void test_my_alloc()
 template <typename T>
 void print(const T & val)
 {
-	cout << val << " ";
+	std::cout << val << " ";
 }
 void test_make_heap()
 {

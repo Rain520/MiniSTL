@@ -3,6 +3,7 @@
 #include "my_iterator.h"
 #include "my_type_traits.h"
 #include <algorithm>
+#include <vector>
 #include <cstddef>
 #include <cstring>
 #include <iostream>
@@ -610,6 +611,13 @@ namespace jan
 		return f;
 	}
 
+ /**
+  * @brief 在写这个排序算法的时候，还没有自建的vector容器，所以使用std::vector
+  * 
+  * @tparam RandomIter 
+  * @param first 
+  * @param last 
+  */
 	template <typename RandomIter>
 	void merge_sort(RandomIter first, RandomIter last)
 	{
@@ -621,10 +629,50 @@ namespace jan
 		merge_sort_iter(first,mid);
 		merge_sort_iter(mid, last);
 		using value_type = typename iterator_traits<RandomIter>::value_type;
-		vector<value_type> vec(last-first);
+		std::vector<value_type> vec(last-first);
 		merge(first,mid,mid,last,vec.begin());
 		copy(vec.begin(),vec.end(),first);
 	}	
+
+  /**
+   * @brief 填充从first开始n个元素为val
+   * 
+   * @tparam OutputIter 
+   * @tparam  
+   * @tparam T 
+   * @param first 
+   * @param n 
+   * @param val 
+   * @return OutputIter 
+   */
+  template <typename OutputIter, typename Size , typename T>
+  inline OutputIter fill_n(OutputIter first, Size n, const T & val)
+  {
+    while(n--)
+    {
+      *first = val;
+      ++first;
+    }
+    return first;
+  }
+
+  /**
+   * @brief 填充[first,last)区间的元素为val
+   * 
+   * @tparam ForwardIter 
+   * @tparam T 
+   * @param first 
+   * @param last 
+   * @param val 
+   * @return ForwardIter 
+   */
+  template <typename ForwardIter, typename T>
+  inline ForwardIter fill(ForwardIter first, ForwardIter last, const T & val)
+  {
+    for(;first != last; ++first)
+      *first = val;
+    return first;
+  }
 
 }// namespace jan
 
