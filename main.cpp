@@ -265,8 +265,35 @@ void test_uninitia()
 void test_vector()
 {
   jan::vector<int> vec(10,2);
-  // for_each(vec.cbegin(), vec.cend(), print<int>);
+//	for_each(vec.cbegin(), vec.cend(), print<int>);
+//	vec.clear();
+//	for_each(vec.cbegin(), vec.cend(), print<int>);
+  vec.push_back(10);
+  vec.push_back(20);
+  cout << "size=" << vec.size() << endl;
+  cout << vec.capacity() <<endl;
+  for_each(vec.cbegin(), vec.cend(), print<int>);
   cout << endl;
+  vec.erase(vec.begin()+5);
+  for_each(vec.cbegin(), vec.cend(), print<int>);
+  cout << endl;
+  vec.resize(0);
+  cout << "call vec.resize(0):";
+  for_each(vec.cbegin(), vec.cend(), print<int>);
+//	cout << "call vec.resize(15,6):";
+  //此功能还未完善，待测
+//	vec.resize(15,6);
+//	for_each(vec.cbegin(), vec.cend(), print<int>);
+//	cout << endl;
+  cout << endl;
+  vec.push_back(1);
+  vec.push_back(2);
+  vec.push_back(3);
+  for_each(vec.cbegin(), vec.cend(), print<int>);
+  vec.pop_back();
+  cout << endl;
+  cout << vec.front() << endl;
+  cout << vec.back() << endl;
 }
 int main()
 {

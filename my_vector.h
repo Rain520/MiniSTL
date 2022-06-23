@@ -33,7 +33,7 @@ namespace jan{
     bool empty() const { return begin() == end(); }
     reference operator[](size_type index) { return *(start + index); }
     reference front() const { return *begin(); }
-    reference back() const { return  *end(); }
+    reference back() const { return  *(end()-1); }
     vector() : start(nullptr), finish(nullptr), the_end(nullptr)
     { }
     vector(size_type n, const T & val) {
@@ -120,7 +120,7 @@ namespace jan{
     {
       destroy(first,last);
     }
-    finish -= (last - finish);
+    finish -= (last - first);
     return first;
   }
 
@@ -141,8 +141,8 @@ namespace jan{
       return;
     if(n < size())
       erase(begin()+n,end());
-    else 
-      insert(end(),n - size(),val);
+//    else
+//      insert(end(),n - size(),val);
   }
 
 
@@ -159,7 +159,7 @@ namespace jan{
   void vector<T,Alloc>::insert_aux(iterator pos, const T & val)
   {
       //如果还有空间
-      if(end() < capacity())
+      if(end() < the_end)
       {
         copy(pos,end(),pos+1);
         *pos = val;
@@ -201,9 +201,8 @@ namespace jan{
   template <typename T, typename Alloc>
   void vector<T,Alloc>::push_back(const T & val)
   {
-    if(end() < capacity()){
+    if(end() < the_end){
       construct(finish++,val);
-      ++finish;
     }
     else
       insert_aux(end(),val);
@@ -262,7 +261,7 @@ namespace jan{
   vector<T,Alloc>::alloc_and_fill(size_type n, const T & val)
   {
     iterator res = data_allocator::allocate(n);
-    jan::uninitialized_fill_n(begin(),n,val);
+    jan::uninitialized_fill_n(res,n,val);
     // std::uninitialized_fill_n(begin(),n,val);
     return res;
   }
@@ -280,7 +279,6 @@ namespace jan{
   void vector<T,Alloc>::fill_initialized(size_type n, const T & val)
   {
     start = alloc_and_fill(n, val);
-    std::cout << "==" << std::endl;
     finish = begin() + n;
     the_end = finish;
   }

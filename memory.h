@@ -20,7 +20,7 @@ namespace jan{
   template <typename ForwardIter, typename Size, typename T>
   inline ForwardIter __uninitialized_fill_n_aux(ForwardIter first, Size n, const T & val, _true_type)
   {
-    return fill_n(first, n, val);
+    return jan::fill_n(first, n, val);
   }
   
   /**
@@ -107,7 +107,7 @@ namespace jan{
   template <typename ForwardIter, typename OutputIter>
   inline OutputIter uninitialized_copy(ForwardIter first, ForwardIter last, OutputIter res)
   {
-    __uninitialized_copy(first, last, res, value_type(first));
+    return __uninitialized_copy(first, last, res, value_type(first));
   }
 
   
