@@ -361,7 +361,7 @@ namespace jan
      */
 	template<typename T>
 	struct __copy_dispatch<const T*, T*> {
-		T* operator()(const T* first, T* last, T* res)
+		T* operator()(const T* first,const T* last, T* res)
 		{
 			using t = typename type_traits<T>::has_trivial_assignment_operator;
 			return __copy_t(first, last, res, t());

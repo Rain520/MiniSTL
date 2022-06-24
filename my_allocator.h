@@ -466,6 +466,15 @@ class allocator
 		std::cout << "[deallocate]" << std::endl;
 		::operator delete (p);
 	}
+
+  /**
+   * @brief 用于原地构造使用
+   * 
+   * @tparam U 
+   * @tparam Args 
+   * @param p 
+   * @param args 
+   */
 	template<typename U, typename... Args>
 	void construct(U * p, Args&&... args)
 	noexcept(noexcept(::new(p) U(std::forward<Args>(args)...)))

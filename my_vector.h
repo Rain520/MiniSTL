@@ -1,10 +1,20 @@
+//注意 ：此类只用于个人学习
+//一个不符合C++标准的vector
+//对于扩充的技术，没有使用&&和std::move()
+
+
 #ifndef __MY_VECTOR_H_
 #define __MY_VECTOR_H_
 #include "my_allocator.h"
 #include "my_algorithm.h"
 #include "memory.h"
+#include "my_iterator.h"
+#include <algorithm>
 #include <cstddef>
+#include <initializer_list>
+#include <ios>
 #include <stdexcept>
+#include <utility>
 
 namespace jan{
   /**
@@ -39,6 +49,24 @@ namespace jan{
     vector(size_type n, const T & val) {
       fill_initialized(n, val);
     }
+    vector(const vector<T> & rhs){
+      start = data_allocator::allocate(rhs.capacity());
+      finish = uninitialized_copy(rhs.begin(), rhs.end(), begin());
+      the_end = start + rhs.capacity();
+    }
+    vector(const std::initializer_list<T> init_ls){
+      start = data_allocator::allocate(init_ls.size());
+      finish = jan::uninitialized_copy(init_ls.begin(), init_ls.end(), begin());
+      the_end = finish;
+    }
+    vector(vector && rhs){
+      start = rhs.start;
+      finish = rhs.finish;
+      the_end = rhs.the_end;
+      rhs.start = nullptr;
+      rhs.finish = nullptr;
+      rhs.the_end = nullptr;
+    }
     ~vector();
     void push_back(const T & val);
     void pop_back();
@@ -46,8 +74,13 @@ namespace jan{
     iterator erase(iterator first, iterator last);
     void resize(size_type n, const T & val = T{});
     void clear();
-    // void insert(iterator pos, size_type n, const T & val);
+    iterator insert(iterator pos, size_type n, const T & val);
     iterator insert(iterator pos, const T & val);
+    T & at(size_type index);
+
+    template <typename ... Args>
+    void emplace_back(Args && ... args);
+
   protected:
     void insert_aux(iterator pos, const T & val);
     iterator start, finish, the_end;
@@ -55,11 +88,96 @@ namespace jan{
     using data_allocator = jan::alloc_adapter<T, Alloc>;
     iterator alloc_and_fill(size_type n, const T & val);
     void fill_initialized(size_type n, const T & val);
+    size_type get_new_size() const { return size() == 0 ? 1 : 2 * size(); }
   };
 
   template <typename T, typename Alloc>
+    template <typename... Args>
+  void vector<T,Alloc>::emplace_back(Args && ... args)
+  {
+    if(end() < the_end)
+    {
+      new(finish)T(std::forward<Args>(args)...);
+      ++finish;
+    }
+    else
+    {
+      auto new_start = data_allocator::allocate(get_new_size());
+      auto new_finish = new_start;
+      try {
+        new_finish = uninitialized_copy(begin(), end(), new_start);
+      } catch (...) {
+        destroy(new_start,new_finish);
+        data_allocator::deallocate(new_start,size());
+        throw;
+      }
+      start = new_start;
+      finish = new_finish;
+      the_end = new_start + size();
+      new(finish)T(std::forward<Args>(args)...);
+      ++finish;
+    }
+  }
+
+  /**
+   * @brief 同operator[]的功能一样，但是数组越界的时候会有out_of_range异常
+   * 
+   * @tparam T 
+   * @tparam Alloc 
+   * @param index 
+   * @return T& 
+   */
+  template <typename T, typename Alloc>
+  T & vector<T,Alloc>::at(size_type index)
+  {
+    if(index >= size() || index < 0)
+      throw std::out_of_range("index out of range");
+    else
+      return this->operator[](index);
+  }
+
+  template <typename T, typename Alloc>
   typename vector<T,Alloc>::iterator
-  vector<T,Alloc>::insert(iterator pos, const T &val)
+  vector<T,Alloc>::insert(iterator pos, size_type n, const T & val)
+  {
+    if (n == 0)
+      return pos;
+    if (n < 0)
+      throw std::invalid_argument("n is less zero");
+    if (size() + n <= capacity())
+    {
+      copy(pos,end(),pos+n);
+      fill_n(pos,n,val);
+      return pos;
+    }
+    else
+    {
+      auto before_idx = pos - start;
+      auto old_size = size();
+      size_type new_size = old_size == 0 ? 1 : 2 * size();
+      auto new_start = data_allocator::allocate(new_size);
+      auto new_finish = new_start;
+      try {
+        new_finish = uninitialized_copy(begin(), pos, new_start);
+        new_finish = uninitialized_fill_n(new_finish,n,val);
+        new_finish = uninitialized_copy(pos,end(),new_finish);
+      } catch (...) {
+        destroy(new_start,new_finish);
+        deallocate();
+        throw;
+      }
+      destroy(begin(),end());
+      deallocate();
+      start = new_start;
+      finish = start + n + old_size;
+      the_end = start + size();
+      return start + before_idx;
+    }
+  }
+
+  template <typename T, typename Alloc>
+  typename vector<T,Alloc>::iterator
+  inline vector<T,Alloc>::insert(iterator pos, const T &val)
   {
     insert_aux(pos, val);
     return pos - 1;
@@ -72,7 +190,7 @@ namespace jan{
    * @tparam Alloc 
    */
   template <typename T, typename Alloc>
-  void vector<T,Alloc>::clear()
+  inline void vector<T,Alloc>::clear()
   {
     erase(begin(),end());
   }
@@ -87,7 +205,7 @@ namespace jan{
    */
   template <typename T, typename Alloc>
   typename vector<T,Alloc>::iterator
-  vector<T,Alloc>::erase(iterator pos)
+  inline vector<T,Alloc>::erase(iterator pos)
   {
     if(pos < begin() || pos >= end())
       throw std::out_of_range("pos out of range");
@@ -109,7 +227,7 @@ namespace jan{
    */
   template <typename T, typename Alloc>
   typename vector<T,Alloc>::iterator
-  vector<T,Alloc>::erase(iterator first, iterator last)
+  inline vector<T,Alloc>::erase(iterator first, iterator last)
   {
     if(last != end())
     {
@@ -133,7 +251,7 @@ namespace jan{
    * @param val 
    */
   template <typename T, typename Alloc>
-  void vector<T,Alloc>::resize(size_type n, const T & val)
+  inline void vector<T,Alloc>::resize(size_type n, const T & val)
   {
     if (n < 0)
       throw std::out_of_range("n is less zero");
@@ -141,8 +259,8 @@ namespace jan{
       return;
     if(n < size())
       erase(begin()+n,end());
-//    else
-//      insert(end(),n - size(),val);
+    else // such as insert(end(),n-cap(),val);
+     insert(end(),n - size(),val);
   }
 
 
@@ -199,7 +317,7 @@ namespace jan{
    * @param val 
    */
   template <typename T, typename Alloc>
-  void vector<T,Alloc>::push_back(const T & val)
+  inline void vector<T,Alloc>::push_back(const T & val)
   {
     if(end() < the_end){
       construct(finish++,val);
@@ -215,7 +333,7 @@ namespace jan{
    * @tparam Alloc 
    */
   template <typename T, typename Alloc>
-  void vector<T,Alloc>::pop_back()
+  inline void vector<T,Alloc>::pop_back()
   {
     --finish;
     destroy(finish);
@@ -228,7 +346,7 @@ namespace jan{
    * @tparam Alloc 
    */
   template <typename T, typename Alloc>
-  void vector<T,Alloc>::deallocate()
+  inline void vector<T,Alloc>::deallocate()
   {
     data_allocator::deallocate(begin(),size());
   }
@@ -240,8 +358,10 @@ namespace jan{
    * @tparam Alloc 
    */
   template <typename T, typename Alloc>
-  vector<T,Alloc>::~vector()
+  inline vector<T,Alloc>::~vector()
   {
+    if(start == finish)
+      return;
     destroy(start,finish);
     deallocate();
   }
@@ -262,7 +382,6 @@ namespace jan{
   {
     iterator res = data_allocator::allocate(n);
     jan::uninitialized_fill_n(res,n,val);
-    // std::uninitialized_fill_n(begin(),n,val);
     return res;
   }
   

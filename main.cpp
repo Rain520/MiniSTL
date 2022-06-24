@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <iostream>
 #include <deque>
 #include <array>
@@ -5,6 +6,7 @@
 #include "my_allocator.h"
 #include "my_iterator.h"
 // #include "my_heap.h"
+#include <new>
 #include <vector>
 #include <algorithm>
 #include <ctime>
@@ -265,36 +267,78 @@ void test_uninitia()
 void test_vector()
 {
   jan::vector<int> vec(10,2);
+  vec.emplace_back(10);
+  for_each(vec.begin(), vec.end(), print<int>);
+  cout << endl;
+  vec.emplace_back(20);
+  for_each(vec.begin(), vec.end(), print<int>);
+  // auto vec_move(std::move(vec));
+  // for_each(vec.begin(), vec.end(), print<int>);
+  // cout << endl;
+  // for_each(vec_move.begin(), vec_move.end(), print<int>);
+  // cin.get();
+  // auto vec_copy(vec);
+  // for_each(vec.begin(), vec.end(), print<int>);
+  // cout << endl;
+  // for_each(vec_copy.begin(), vec_copy.end(), print<int>);
+  // cout << endl;
+  // jan::vector<int> vv ({1,3,6,5,8,9,45,4,4,4});
+  // for_each(vv.begin(), vv.end(), print<int>);
+
 //	for_each(vec.cbegin(), vec.cend(), print<int>);
 //	vec.clear();
 //	for_each(vec.cbegin(), vec.cend(), print<int>);
-  vec.push_back(10);
-  vec.push_back(20);
-  cout << "size=" << vec.size() << endl;
-  cout << vec.capacity() <<endl;
-  for_each(vec.cbegin(), vec.cend(), print<int>);
-  cout << endl;
-  vec.erase(vec.begin()+5);
-  for_each(vec.cbegin(), vec.cend(), print<int>);
-  cout << endl;
-  vec.resize(0);
-  cout << "call vec.resize(0):";
-  for_each(vec.cbegin(), vec.cend(), print<int>);
+//   vec.push_back(10);
+//   vec.push_back(20);
+//   cout << "size=" << vec.size() << endl;
+//   cout << vec.capacity() <<endl;
+//   for_each(vec.cbegin(), vec.cend(), print<int>);
+//   cout << endl;
+//   vec.erase(vec.begin()+5);
+//   for_each(vec.cbegin(), vec.cend(), print<int>);
+//   cout << endl;
+//   vec.resize(0);
+//   cout << "call vec.resize(0):";
+//   for_each(vec.cbegin(), vec.cend(), print<int>);
 //	cout << "call vec.resize(15,6):";
-  //此功能还未完善，待测
-//	vec.resize(15,6);
-//	for_each(vec.cbegin(), vec.cend(), print<int>);
+	// vec.resize(15,6);
+	// for_each(vec.cbegin(), vec.cend(), print<int>);
 //	cout << endl;
-  cout << endl;
-  vec.push_back(1);
-  vec.push_back(2);
-  vec.push_back(3);
-  for_each(vec.cbegin(), vec.cend(), print<int>);
-  vec.pop_back();
-  cout << endl;
-  cout << vec.front() << endl;
-  cout << vec.back() << endl;
+//   cout << endl;
+//   vec.push_back(1);
+//   vec.push_back(2);
+//   vec.push_back(3);
+//   for_each(vec.cbegin(), vec.cend(), print<int>);
+//   vec.pop_back();
+//   cout << endl;
+//   cout << vec.front() << endl;
+//   cout << vec.back() << endl;
+  // vec.insert(vec.end()-1,10,100);
+  // for_each(vec.cbegin(), vec.cend(), print<int>);
+  // std::vector<int> std_vec(10,1);
+  // jan::vector<int> my_vec(10,1);
+  // for(int i = 0;i < 40; ++i)
+  // {
+  //   int idx = rand() % std_vec.size();
+  //   // cout << "idx=" << idx << endl;
+  //   my_vec.insert(my_vec.begin()+idx,idx,idx);
+  //   std_vec.insert(std_vec.begin()+idx,idx,idx);
+  // }
+  // bool eq = true;
+  // for(int i=0;i<std_vec.size();++i)
+  // {
+  //   if(my_vec[i]!=std_vec[i])
+  //   {
+  //     cout << "not equal" << endl;
+  //     eq = false;
+  //     break;
+  //   }
+  // }
+  // if(eq)
+  //   cout << "ok" << endl;
+
 }
+
 int main()
 {
 	//	test_pop_heap();
