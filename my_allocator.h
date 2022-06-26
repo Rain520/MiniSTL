@@ -14,7 +14,7 @@
 //#define __MY_ALLOC_DEBUG
 namespace jan{
 
-//ÏÂÁĞÒ»Ğ©º¯ÊıÊÇÅäÖÃÆ÷¾­³£ÓÃµ½µÄ·½·¨£¬½øĞĞÁËÒ»Ğ©ÓÅ»¯
+//ï¿½ï¿½ï¿½ï¿½Ò»Ğ©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½ï¿½Ä·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»Ğ©ï¿½Å»ï¿½
 
  /**
   * @brief before C++11 
@@ -41,7 +41,8 @@ namespace jan{
 	inline void construct(T * p, Args && ... args)
 	noexcept (noexcept(::new(p) T(std::forward<Args>(args)...)))
 	{
-		new T(std::forward<Args>(args)...);
+    std::cout << "call args..." << std::endl;
+		new (p) T(std::forward<Args>(args)...);
 	}
 
 	template <typename T>
@@ -79,7 +80,7 @@ namespace jan{
 
 
  /**
-  * @brief İÍÈ¡³öÊÇ·ñÊÇPODÀàĞÍ£¬È»ºóÖØÔØµ÷ÓÃÖØÔØµÄaux°æ±¾
+  * @brief ï¿½ï¿½È¡ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½PODï¿½ï¿½ï¿½Í£ï¿½È»ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½auxï¿½æ±¾
   * 
   * @tparam ForwardIterator 
   * @tparam T 
@@ -94,7 +95,7 @@ namespace jan{
 	}
 
   /**
-   * @brief ÓÃ»§Ó¦µ±Ê¹ÓÃÕâ¸ö
+   * @brief ï¿½Ã»ï¿½Ó¦ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½
    * 
    * @tparam ForwardIterator 
    * @param first 
@@ -109,7 +110,7 @@ namespace jan{
   //such as new_handler
 	using malloc_handler = void (*)();
  /**
-  * @brief Ò»¼¶ÅäÖÃÆ÷£¬ÓÃÓÚÅäÖÃ´ó¿éÄÚ´æ
+  * @brief Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½Ú´ï¿½
   * 
   * @tparam ints 
   */
@@ -142,7 +143,7 @@ namespace jan{
 			return res;
 		}
 
-		//Ò»ÏÂº¯ÊıÓÃÓÚ·ÂÕæC++ÖĞµÄnew_handler
+		//Ò»ï¿½Âºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú·ï¿½ï¿½ï¿½C++ï¿½Ğµï¿½new_handler
 		static malloc_handler set_malloc_handler(malloc_handler handler)
 		{
 			malloc_handler old_handler = malloc_alloc_oom_handler;
@@ -187,14 +188,14 @@ namespace jan{
 		}
 	}
 
-	//ÉèÖÃÒ»¼¶ÅäÖÃÆ÷
+	//ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	using malloc_alloc = level_one_alloc_template<0>;
 
-  //Îª¶ş¼¶ÅäÖÃÆ÷×¼±¸µÄÒ»Ğ©Ã¶¾ÙÖµ
+  //Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×¼ï¿½ï¿½ï¿½ï¿½Ò»Ğ©Ã¶ï¿½ï¿½Öµ
 	enum {_ALIGN = 8, _MAX_BYES = 128, _NFREELISTS = _MAX_BYES / _ALIGN}; // NOLINT(bugprone-reserved-identifier)
 
   /**
-   * @brief ¶ş¼¶ÅäÖÃÆ÷£¬Ê¹ÓÃÄÚ´æ³Ø¼¼Êõ£¬ÔÚÇëÇóÄÚ´æ¿é´óµÄÊ±ºòµ÷ÓÃÒ»¼¶ÅäÖÃÆ÷
+   * @brief ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½Ú´ï¿½Ø¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
    * 
    * @tparam ints 
    */
@@ -202,13 +203,13 @@ namespace jan{
 	class level_two_alloc_template
 	{
 	 private:
-		//ÏòÉÏÈ¡Õû8µÄ±¶Êı
+		//ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½8ï¿½Ä±ï¿½ï¿½ï¿½
 		static size_t round_up(size_t size)
 		{
 			return (size + _ALIGN - 1)  & ~(_ALIGN - 1);
 		}
-		//ÄÚ´æÇø¿é¶ÔÓ¦µÄ×ÔÓÉÁ´±íµÄÎ»ÖÃÎªÈô²»ÊÇ8µÄ±¶Êı£¬ÏòÉÏÕÒµ½×îĞ¡8µÄ±¶Êı¶ÔÓ¦µÄ½Úµã
-		//ÀıÈç30ÕÒµ½32£¬60ÕÒµ½64
+		//ï¿½Ú´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½8ï¿½Ä±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½Ğ¡8ï¿½Ä±ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½Ä½Úµï¿½
+		//ï¿½ï¿½ï¿½ï¿½30ï¿½Òµï¿½32ï¿½ï¿½60ï¿½Òµï¿½64
 		static size_t FINDLIST_INDEX(size_t size)
 		{
 			return (size + _ALIGN - 1)/_ALIGN - 1;
@@ -222,8 +223,8 @@ namespace jan{
 		static obj * free_list[_NFREELISTS];
 		static void * refill(size_t size);
 		static void * chunk_alloc(size_t size, int & nobjs);
-		static char * start_free;	 //ÄÚ´æ³ØÆğÊ¼Î»ÖÃ
-		static char * end_free;		//ÄÚ´æ³Ø½áÊøÎ»ÖÃ
+		static char * start_free;	 //ï¿½Ú´ï¿½ï¿½ï¿½ï¿½Ê¼Î»ï¿½ï¿½
+		static char * end_free;		//ï¿½Ú´ï¿½Ø½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
 		static size_t heap_size;
 
 	 public:
@@ -289,7 +290,7 @@ namespace jan{
 			std::cout << "3" << std::endl;
 #endif
 			size_t byte_to_get = 2 * tot_byte + round_up(heap_size >> 4);
-			//Èç¹û»¹ÓĞÒ»Ğ©Ê£ÓàÄÚ´æ£¬¹æÕûµ½×ÔÓÉÁ´±íÖĞ
+			//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»Ğ©Ê£ï¿½ï¿½ï¿½Ú´æ£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			if(remain > 0)
 			{
 				auto free_list_of_index = free_list + FINDLIST_INDEX(remain);
@@ -297,10 +298,10 @@ namespace jan{
 				*free_list_of_index = (obj*)start_free;
 			}
 
-			//ÔÚheapÇøÅäÖÃ¿Õ¼ä
+			//ï¿½ï¿½heapï¿½ï¿½ï¿½ï¿½ï¿½Ã¿Õ¼ï¿½
 			start_free = (char *)malloc(byte_to_get);
 
-			//ÔÚ×ÔÓÉÁ´±íÖĞÑ°ÕÒ¿ÉÓÃÄÚ´æ
+			//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ°ï¿½Ò¿ï¿½ï¿½ï¿½ï¿½Ú´ï¿½
 			if(res == nullptr)
 			{
 				size_t i;
@@ -408,7 +409,7 @@ namespace jan{
 		}
 
     /**
-     * @brief ·µ»ØÒ»¸ösizeof TÄÚ´æ´óĞ¡µÄÊ×µØÖ·
+     * @brief ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½sizeof Tï¿½Ú´ï¿½ï¿½Ğ¡ï¿½ï¿½ï¿½×µï¿½Ö·
      * 
      * @return T* 
      */
@@ -434,7 +435,7 @@ namespace jan{
 namespace jan{
 
 /**
- * @brief ×î¼òµ¥µÄÅäÖÃÆ÷£¬½ö½öÊ¹ÓÃ::operator newÀ´·ÖÅäÄÚ´æ, ¶¨Î»newÀ´³õÊ¼»¯¶ÔÏó
+ * @brief ï¿½ï¿½òµ¥µï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½::operator newï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½, ï¿½ï¿½Î»newï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  *        
  * @tparam T 
  */
@@ -468,7 +469,7 @@ class allocator
 	}
 
   /**
-   * @brief ÓÃÓÚÔ­µØ¹¹ÔìÊ¹ÓÃ
+   * @brief ï¿½ï¿½ï¿½ï¿½Ô­ï¿½Ø¹ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½
    * 
    * @tparam U 
    * @tparam Args 
