@@ -19,13 +19,15 @@ namespace jan {
     self *_pre;
     self *_next;
     template <typename ... Args>
-    explicit _list_node(Args && ... args, self * pre, self * next) : _data(std::forward<Args>(args)...),
-      _pre(pre), _next(next)
+    explicit _list_node(Args && ... args, self * pre = nullptr, self * next = nullptr)
+     : _data(10), _pre(pre), _next(next)
     { }
 
-    explicit _list_node(const T &val = T(), self *pre = nullptr,
+    explicit _list_node(const T & val = T(), self *pre = nullptr,
                         self *next = nullptr)
-        : _data(val), _pre(pre), _next(next) {}
+        : _data(val), _pre(pre), _next(next) {
+          std::cout << _data  << " ---" << std::endl;
+        }
   };
 
   /**
@@ -43,7 +45,7 @@ namespace jan {
     using self = _list_iterator<T>;
     using node_type = _list_node<T>;
     using difference_type = ptrdiff_t;
-    T &operator*() { return (*_node)._data; }
+    T &operator*() { return _node->_data; }
     T *operator->() { return &*_node; }
     bool operator==(const self &rhs) { return _node == rhs._node; }
     bool operator!=(const self &rhs) { return _node != rhs._node; }
@@ -82,11 +84,6 @@ namespace jan {
     using node_type = _list_node<T>;
   public:
 
-    list() 
-    {
-      _base_node = creat_node(T{},_base_node,_base_node);
-    }
-
     using iterator = _list_iterator<T>;
     using size_type = size_t;
     iterator begin() const { return iterator(_base_node->_next); }
@@ -102,14 +99,20 @@ namespace jan {
 
   protected:
     //此节点为基点，也是尾后节点
-    using data_alloc = alloc_adapter<node_type, Alloc>;
+    using node_alloc = alloc_adapter<node_type, Alloc>;
     //传回一个节点大小内存空间
-    node_type * get_node() { return data_alloc::allocate(); }
-    void put_node(node_type * p) { data_alloc::deallocate(p); }
+    node_type * get_node() { return node_alloc::allocate(); }
+    void put_node(node_type * p) { node_alloc::deallocate(p); }
     template <typename ... Args>
-    node_type * creat_node(Args && ... args,node_type * pre, node_type * next) {
+    node_type * creat_node(Args && ... args) {
       auto ret = get_node();
-      construct(ret,std::forward<Args>(args)...,pre,next);
+      construct(ret,std::forward<Args>(args)...);
+      return ret;
+    }
+    node_type * creat_node(const T & val)
+    {
+      auto ret = get_node();
+      construct(ret,val);
       return ret;
     }
     void destroy_node(node_type * p)
@@ -119,17 +122,26 @@ namespace jan {
     }
     
     node_type * _base_node;
+    public:
+      list()
+      {
+        _base_node = creat_node(T{});
+        _base_node->_next = _base_node;
+        _base_node->_pre = _base_node;
+      }
     
   };
    
   template <typename T, typename Alloc>
   typename list<T,Alloc>::iterator
-  list<T,Alloc>::insert(iterator pos, const T &val)
+  list<T,Alloc>::insert(iterator pos, const T &val) //val无问题
   {
-    auto node = creat_node(val, pos._node->_pre, pos._node);
-    pos._node->pre->next = node;
-    pos._node->pre = node;
-    return node;
+    node_type * node = creat_node(val);
+    node->_pre = pos._node->_pre;
+    node->_next = pos._node;
+    pos._node->_pre->_next = node;
+    pos._node->_pre = node;
+    return iterator(node);
   }
 
 } // namespace jan
