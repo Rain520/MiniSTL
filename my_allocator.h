@@ -41,7 +41,6 @@ namespace jan{
 	inline void construct(T * p, Args && ... args)
 	noexcept (noexcept(::new(p) T(std::forward<Args>(args)...)))
 	{
-    std::cout << "call args..." << std::endl;
 		new (p) T(std::forward<Args>(args)...);
 	}
 
@@ -425,7 +424,7 @@ namespace jan{
 
 		static void deallocate(T * p)
 		{
-			Alloc::delllocate(p,sizeof (T));
+			Alloc::dellocate(p,sizeof (T));
 		}
 	};
 }	//namespace jan
