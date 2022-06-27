@@ -1,14 +1,12 @@
 #ifndef __MY_LIST_
 #define __MY_LIST_
 
+#include "my_algorithm.h"
 #include "my_allocator.h"
 #include "my_iterator.h"
 #include <cstddef>
-#include <functional>
 #include <initializer_list>
-#include <list>
 #include <stdexcept>
-#include <utility>
 namespace jan {
 
 /**
@@ -107,8 +105,9 @@ public:
   void splice(iterator pos, list & x);
   void splice(iterator pos, list &, iterator i);
   void splice(iterator pos, list & x, iterator first, iterator last);
+  void reverse();
+  void merge(list<T,Alloc> & ls);
 protected:
-  //此节点为基点，也是尾后节点
   using node_alloc = alloc_adapter<node_type, Alloc>;
   //传回一个节点大小内存空间
   node_type *get_node() { return node_alloc::allocate(); }
@@ -124,12 +123,33 @@ protected:
     return ret;
   }
   void destroy_node(node_type *p) {
+    if(p == nullptr)
+      return;
     destroy(&(p->_data));
     put_node(p);
   }
 
+  //此节点为基点，也是尾后节点
   node_type *_base_node;
-
+  
+  //回收所有的数据节点，也就是除了_base_node的所有节点，
+  //并把_base_node 下的pre next 滞空
+  void dealloc_all_data_node()
+  {
+    //for move construct
+    if (_base_node == nullptr)
+      return;
+    auto cur = begin();
+    while (cur != end())
+    {
+      auto tmp = cur;
+      ++tmp;
+      destroy_node(cur._node);
+      cur = tmp;
+    }
+    _base_node->_next = nullptr;
+    _base_node->_pre = nullptr;
+  }
 public:
   list() {
     _base_node = creat_node(T{});
@@ -140,11 +160,87 @@ public:
   list(const std::initializer_list<T> & ls) : list()
   {
     for(auto it = ls.begin(); it != ls.end(); ++it)
-    {
       push_back(*it);
-    }
+  }
+
+  explicit list(size_type n, const T & val = T{})
+  {
+    while(n--)
+      push_back(val);
+  }
+
+  list(const list<T,Alloc> & rhs)
+  {
+    for(const auto & val : rhs)
+      push_back(val);
+  }
+
+  list(list<T,Alloc> && rhs)
+  {
+    _base_node = rhs._base_node;
+    rhs._base_node = nullptr;
+  }
+
+  ~list()
+  {
+    dealloc_all_data_node();
+    //if _base_node = nullptr it's also no problem
+    destroy_node(_base_node);
   }
 };
+
+
+/**
+ * @brief 将ls合并到*this上，请确保两个list均已经排序, 否则这是一个未定义的行为
+ * 
+ * @tparam T 
+ * @tparam Alloc 
+ * @param ls 
+ */
+template <typename T, typename Alloc>
+void list<T,Alloc>::merge(list<T, Alloc> &ls)
+{
+  auto first1 = begin(), last1 = end(),
+       first2 = ls.begin(), last2 = ls.end();
+  while (first1 != last1 && first2 != last2)
+  {
+    if(*first2 < *first1)
+    {
+      auto next = first2;
+      transfer(first1, first2, ++next);
+      first2 = next;
+    }
+    else
+      ++first1;
+  }
+  //还有元素，是ls中比*this的所有元素都大的元素
+  if(first2 != last2)
+    transfer(last1, first2, last2);
+}
+
+/**
+ * @brief 将链表翻转
+ * 
+ * @tparam T 
+ * @tparam Alloc 
+ */
+template <typename T, typename Alloc>
+void list<T,Alloc>::reverse()
+{
+  //if size = 0 || size = 1
+  if(_base_node->_next == _base_node || _base_node->_next->_next == _base_node)
+    return;
+  //对于每个节点，均使用swap交换pre and next，即可达到实现翻转的效果
+  auto cur = begin();
+  while (cur != end())
+  {
+    auto tmp = cur;
+    ++tmp;
+    swap(cur._node->_pre,cur._node->_next);
+    cur = tmp;
+  }
+  swap(cur._node->_pre,cur._node->_next); 
+}
 
 /**
  * @brief 将i指向元素拼接在pos之前

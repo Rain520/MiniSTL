@@ -2,6 +2,7 @@
 #include <iostream>
 #include <deque>
 #include <array>
+#include "my_list.h"
 #include "my_vector.h"
 #include "my_allocator.h"
 #include "my_iterator.h"
@@ -339,8 +340,58 @@ void test_vector()
 
 }
 
+void test_my_list()
+{
+  jan::list<int> ls1 {1,3,4,6,7,9};
+  jan::list<int> ls2 {2,5,8,10,11};
+  jan::list<int> ls3 {-1,-1,0,0,1,2,3,4,4,4,5,5,6,7,8,9,100};
+  ls1.merge(ls2);
+  cout << "ls1 : ";
+  std::for_each(ls1.begin(), ls1.end(), print<int>);
+  cout << "\nls2 : ";
+  std::for_each(ls2.begin(), ls2.end(), print<int>);
+  cout << '\n';
+  ls1.merge(ls3);
+  cout << "ls1 : ";
+  std::for_each(ls1.begin(), ls1.end(), print<int>);
+
+
+  // jan::list<int> ls{1,2,3,3,3,6,6,6,5,5,5,6,6,5,7,7,8,9};
+  // ls.unique();
+  // std::for_each(ls.begin(), ls.end(), print<int>);
+  // cout << endl;
+  // ls.reverse();
+  // std::for_each(ls.begin(), ls.end(), print<int>);
+  // cout << endl;
+
+  // cout << "after move : ";
+  // auto ls_move(std::move(ls));
+  // std::for_each(ls_move.begin(), ls_move.end(), print<int>);
+  // cout << endl;
+  // for(int i = 0; i< 20; ++i)
+  // {
+  //   ls.push_back(i);
+  // }
+  // std::for_each(ls.begin(), ls.end(), print<int>);
+  // cout << endl;
+  // ls.pop_back();
+  // ls.pop_front();
+  
+  // std::for_each(ls.begin(), ls.end(), print<int>);
+  // cout << endl;
+  // ls.push_back(10);
+  // ls.push_front(9);
+  // std::for_each(ls.begin(), ls.end(), print<int>);
+  // cout << endl;
+
+  // ls.erase(ls.begin());
+  // std::for_each(ls.begin(), ls.end(), print<int>);
+  // cout << endl;
+}
 int main()
 {
+  std::vector<int> vec;
+  vec.emplace_back(10);
 	//	test_pop_heap();
 	// test_my_push_heap();
 	// test_my_pop_heap();
@@ -353,7 +404,8 @@ int main()
 	// test_my_pair();
 	// test_my_copy();
   // test_uninitia();
-  test_vector();
+  // test_vector();
+  test_my_list();
 	cin.get();
 	return 0;
 }
