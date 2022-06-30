@@ -47,7 +47,7 @@ namespace jan{
 	template <typename T>
 	inline void destroy(T * p)
 	{
-		p->~T();
+    p->~T();
 	}
 
   /**

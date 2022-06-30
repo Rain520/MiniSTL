@@ -175,6 +175,11 @@ public:
       push_back(val);
   }
 
+  /**
+   * @brief 移动构造，将被移动的list 的 _base_node 置空，确保能被正常析构
+   * 
+   * @param rhs 
+   */
   list(list<T,Alloc> && rhs)
   {
     _base_node = rhs._base_node;
