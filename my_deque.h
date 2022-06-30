@@ -79,7 +79,27 @@ struct __deuqe_iterator
     return ret;
   }
 
-  
+  /**
+   * @brief 返回两个迭代器之间的距离
+   * 
+   * @param rhs 
+   * @return difference_type 
+   */
+  difference_type operator-(const iterator & rhs) const
+  {
+    return static_cast<difference_type>(buffer_size()) * (node - rhs.node - 1)
+     + (cur - first) + (last - cur);
+  }
+
+  /**
+   * @brief 迭代器的随机访问
+   * 
+   * @param n 
+   * @return iterator& 
+   */
+  iterator & operator+=(difference_type n)
+  {
+  }
   static size_t buffer_size();
 };
 
